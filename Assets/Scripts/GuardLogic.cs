@@ -8,11 +8,13 @@ public class GuardLogic : MonoBehaviour
     [SerializeField] private float moveSpeed;
     [SerializeField] private float rotationPerSec;
     [SerializeField] private float alertRange;
+    [SerializeField] private float chaseRange;
     [SerializeField] private float chaseChance;
     [SerializeField] private string[] states;
     [SerializeField] private float runAwaySetTime;
+    [SerializeField] private float sightAngle;
 
-    private float runAwayCurrentTime = 0f;
+    private float runAwayCurrentTime;
     private int currentState;
     private GameObject player;
 
@@ -21,10 +23,19 @@ public class GuardLogic : MonoBehaviour
         gameObject.GetComponent<Renderer>().material.color = Color.red;
         currentState = 0;
         player = GameObject.FindGameObjectWithTag("Player");
+        runAwayCurrentTime = runAwaySetTime;
     }
 
     void FixedUpdate()
     {
+        Ray ray = new Ray(transform.position, player.transform.position - transform.position);
+        float angleToPlayer = Vector3.Angle(transform.forward, ray.direction);
+        RaycastHit rayHit;
+        if (currentState == 0 && angleToPlayer <= sightAngle && angleToPlayer >= -sightAngle
+            && Physics.Raycast(ray, out rayHit, alertRange) && rayHit.transform.CompareTag("Player")) currentState = 1;
+        else if ((currentState == 2 || currentState == 1) && angleToPlayer <= sightAngle && angleToPlayer >= -sightAngle
+            && !Physics.Raycast(ray, chaseRange)) currentState = 0;
+
         if (states[currentState] == "Patrol")
         {
             transform.position += transform.forward * moveSpeed;
@@ -47,6 +58,7 @@ public class GuardLogic : MonoBehaviour
         else if (states[currentState] == "Run Away")
         {
             transform.position += transform.forward * moveSpeed;
+            runAwayCurrentTime -= Time.deltaTime;
         }
         else if (states[currentState] == "Shoot")
         {
@@ -55,32 +67,7 @@ public class GuardLogic : MonoBehaviour
         if (runAwayCurrentTime <= 0f)
         {
             currentState = 0;
-        }
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            currentState = 1;
-        }
-    }
-
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (collision.collider.CompareTag("TearGas"))
-        {
-            currentState = 3;
-            transform.Rotate(0, 90f, 0);
             runAwayCurrentTime = runAwaySetTime;
-        }
-    }
-
-    private void OnTriggerExit(Collider other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            currentState = 0;
         }
     }
 }

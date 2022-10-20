@@ -458,7 +458,6 @@ GameObject:
   - component: {fileID: 1606610267}
   - component: {fileID: 1606610272}
   - component: {fileID: 1606610266}
-  - component: {fileID: 1606610271}
   - component: {fileID: 1606610270}
   m_Layer: 0
   m_Name: Guard
@@ -559,7 +558,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 0.5
   rotationPerSec: 5
-  alertRange: 0
+  alertRange: 10
+  chaseRange: 15
   chaseChance: 0.3333333
   states:
   - Patrol
@@ -567,20 +567,8 @@ MonoBehaviour:
   - Chase
   - Run Away
   - Shoot
---- !u!136 &1606610271
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1606610265}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  m_Radius: 10
-  m_Height: 30
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
+  runAwaySetTime: 2
+  sightAngle: 45
 --- !u!54 &1606610272
 Rigidbody:
   m_ObjectHideFlags: 0
